@@ -22,11 +22,16 @@ class TableMethod(object):
     
     def add_slack(self):
         for i in range(self.n):
-            self.A[i].extend([0 if j!=i else 1 for j in range(self.n)])
+            self.A[i].extend([0 if j!=i else 1 for j in range(self.n+1)])
             
     def add_rhs(self, line):
         for i in range(self.n):
             self.A[i].append(line[i])
+            
+    def add_objective(self, line):
+        line = [-1 * x for x in line]
+        line.extend([0 if i != self.n else 1 for i in range(self.n+2)])
+        self.A.append(line)
             
 l = [[4, 3, 1], [1, 1, 1], [2, 1, -1]]
 t = TableMethod(3,3)
@@ -35,7 +40,8 @@ for each in l:
 print(t.A)
 t.add_slack()
 print(t.A)
-t.add_rhs([3, 10, 11])
+t.add_rhs([3, 10, 10])
+t.add_objective([2, -3, 4])
 t.get_tableau()
     
     
