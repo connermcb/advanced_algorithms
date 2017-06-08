@@ -35,7 +35,9 @@ class TableMethod(object):
             
     def find_pivot(self):
         col = min([each for each in enumerate(self.A[-1][:-1]) if each[1] < 0], key=lambda x:x[1])[0]
-        possible_rows = enumerate([self.A[i][-1]/float(self.A[i][col]) for i in range(self.n)])
+        possible_rows = enumerate([self.A[i][-1]/float(self.A[i][col]) \
+                                   if self.A[i][col] != 0 else float('inf')\
+                                   for i in range(self.n)])
         row = min([each for each in possible_rows if each[1] > 0], key=lambda x:x[1])[0]
         return row, col
         
@@ -60,31 +62,40 @@ class TableMethod(object):
             if to_change == 0:
                 continue
             lcm = self.lcm(pivot, to_change)
-            print(lcm)
             r1 = [self.A[p_row][j]*(lcm/pivot) for j in range(self.m*2+2)]
             r2 = [self.A[i][j]*(lcm/abs(to_change)) for j in range(self.m*2+2)]
-            print(r2)
             if np.sign(pivot) == np.sign(to_change):
                 self.A[i] = list(np.subtract(r2, r1))
             elif np.sign(pivot) != np.sign(to_change):
                 self.A[i] = list(np.add(r1, r2))
             
-            
+    def check_for_negs(self):
+        test = np.array(self.A[-1])
+        return (test<0).any()
+    
+    def gauss(self):
+        while self.check_for_negs():
+            print(9)
+            p_row, p_col = self.find_pivot()
+            self.clear_col(p_row, p_col)
         
-        
-        
-l = [[4, 3, 1], [1, 1, 1], [2, 1, -1]]
+l = [[7,0,1], [1,2,0], [0,3,4]]
 t = TableMethod(3,3)
 for each in l:
     t.add_line(each)
 
 t.add_slack()
-t.add_rhs([3, 10, 10])
-t.add_objective([2, -3, 4])
+t.add_rhs([6,20,30])
+t.add_objective([1,2,3])
 t.get_tableau()
-t.find_pivot()
-p_row, p_col = t.find_pivot()
-t.clear_col(p_row, p_col)
+t.gauss()
+
+
+
+#print(t.check_for_negs())
+#t.find_pivot()
+#p_row, p_col = t.find_pivot()
+#t.clear_col(p_row, p_col)
 print()
 t.get_tableau()
     
