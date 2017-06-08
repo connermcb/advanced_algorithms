@@ -3,7 +3,7 @@
 """
 Simplex Method for Linear Programs
 """
-
+import numpy as np
 import sys
 
 class TableMethod(object):
@@ -37,21 +37,56 @@ class TableMethod(object):
         col = min([each for each in enumerate(self.A[-1][:-1]) if each[1] < 0], key=lambda x:x[1])[0]
         possible_rows = enumerate([self.A[i][-1]/float(self.A[i][col]) for i in range(self.n)])
         row = min([each for each in possible_rows if each[1] > 0], key=lambda x:x[1])[0]
-        print(row, col)
-
-
+        return row, col
+        
+    def lcm(self, x, y):
+        x= abs(x)
+        y= abs(y)
+        if x > y:
+            greater = x
+        else:
+            greater = y
+        while(True):
+            if((greater % x == 0) and (greater % y == 0)):
+                lcm = greater
+                break
+            greater += 1
+        return lcm
+   
+    def clear_col(self, p_row, p_col):
+        pivot = self.A[p_row][p_col] 
+        for i in [j for j in range(self.n+1) if j != p_row]:
+            to_change = self.A[i][p_col]
+            if to_change == 0:
+                continue
+            lcm = self.lcm(pivot, to_change)
+            print(lcm)
+            r1 = [self.A[p_row][j]*(lcm/pivot) for j in range(self.m*2+2)]
+            r2 = [self.A[i][j]*(lcm/abs(to_change)) for j in range(self.m*2+2)]
+            print(r2)
+            if np.sign(pivot) == np.sign(to_change):
+                self.A[i] = list(np.subtract(r2, r1))
+            elif np.sign(pivot) != np.sign(to_change):
+                self.A[i] = list(np.add(r1, r2))
+            
+            
+        
+        
         
 l = [[4, 3, 1], [1, 1, 1], [2, 1, -1]]
 t = TableMethod(3,3)
 for each in l:
     t.add_line(each)
-print(t.A)
+
 t.add_slack()
-print(t.A)
 t.add_rhs([3, 10, 10])
 t.add_objective([2, -3, 4])
 t.get_tableau()
-print(t.find_pivot())
+t.find_pivot()
+p_row, p_col = t.find_pivot()
+t.clear_col(p_row, p_col)
+print()
+t.get_tableau()
     
         
     
