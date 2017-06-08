@@ -78,7 +78,21 @@ class TableMethod(object):
             print(9)
             p_row, p_col = self.find_pivot()
             self.clear_col(p_row, p_col)
-        
+    
+    def get_values(self):
+        results = []
+        for col in range(self.m):
+            col_values = [self.A[i][col] for i in range(self.n)]
+            if np.count_nonzero(col_values) == 1:
+                row = np.nonzero(col_values)[0][0]
+                results.append(self.A[row][-1]/self.A[row][col])
+            else:
+                results.append(0)
+        return results
+    
+    def get_max(self):
+        return self.A[-1][-1]/self.A[-1][-2]
+    
 l = [[7,0,1], [1,2,0], [0,3,4]]
 t = TableMethod(3,3)
 for each in l:
@@ -91,14 +105,11 @@ t.get_tableau()
 t.gauss()
 
 
-
-#print(t.check_for_negs())
-#t.find_pivot()
-#p_row, p_col = t.find_pivot()
-#t.clear_col(p_row, p_col)
 print()
 t.get_tableau()
-    
+print()
+print(t.get_max())
+print(t.get_values())
         
     
         
